@@ -90,7 +90,7 @@ EOF
     
     cat <<EOF
 
-You should add a DNS CNAME record to $(domainname)
+You should add a DNS CNAME record to ${domainname}
 ----------------------------------------------------
 EOF
 }
