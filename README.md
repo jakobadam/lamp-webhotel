@@ -16,7 +16,7 @@ Setup the server:
 Add new vhost and optionally db:
 
 ```
-./mkvhost VHOST [DB]
+./add VHOST [DB]
 ```
 
 This create directories under /srv/www/VHOST/{tmp,htdocs,includes}
@@ -32,5 +32,5 @@ vagrant up ubuntu
 vagrant ssh ubuntu
 cd /vagrant
 ./install
-./mkvhost foo foo
+./add foo foo
 ```
