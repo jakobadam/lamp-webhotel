@@ -3,6 +3,8 @@
 Script to setup a simple webhotel with Apache, MySQL, PHP, and
 phpmyadmin.
 
+Tested on Ubuntu 14.04
+
 ## Quick Start
 
 Setup the server:
