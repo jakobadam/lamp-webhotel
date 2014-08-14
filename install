@@ -32,6 +32,9 @@ auth    required pam_pwdfile.so pwdfile /etc/vsftpd/passwd
 account required pam_permit.so
 EOF
 
+# Remove the default ubuntu apache site
+echo '' > /var/www/html/index.html
+
 # Secure phpmyadmin with basic auth
 # valid users are the ones in /etc/vsftp/passwd
 
