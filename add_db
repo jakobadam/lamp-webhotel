@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+USER=$1
+PASS=$2
+DB_NAME=$3
+
+if [ -z "$DB_NAME" ]; then
+    echo "Usage: $0 USER PASS DB_NAME"
+    exit
+fi
+
+echo "Adding database: ${DB_NAME} for user: ${USER}"
+read -s -p 'Enter MySQL root password:' DB_ROOT_PWD
+mysql -u root -p$DB_ROOT_PWD <<EOF
+CREATE database ${DB_NAME};
+CREATE USER '${USER}'@'%' IDENTIFIED BY '${PASS}';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX, CREATE TEMPORARY TABLES ON \`${DB_NAME}\`.* TO '${DB_NAME}'@'%';
+FLUSH PRIVILEGES;
+EOF
+

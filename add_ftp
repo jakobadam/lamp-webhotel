@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+USER=$1
+PASS=$2
+
+if [ -z "$PASS" ]; then
+    echo "Usage: $0 USER PASS"
+    exit
+fi
+
+echo "local_root=/srv/www/${USER}" > /tmp/${USER}.tmp
+mv /tmp/${USER}.tmp /etc/vsftpd_users/${USER}

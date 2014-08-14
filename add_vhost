@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+HERE=$(dirname $(readlink -f $0))
+VHOST=$1
+
+if [ -z "${VHOST}" ]; then
+    echo "Usage: $0 VHOST"
+    exit
+fi
+
+echo "Creating vhost: ${VHOST}"
+sed s/VHOST/${VHOST}/g $HERE/templates/vhosttemplate > /etc/apache2/sites-available/${VHOST}.conf
+
+mkdir -p /srv/www/${VHOST}/{tmp,htdocs,includes}
+sed s/VHOST/${VHOST}/g $HERE/templates/index.html > /srv/www/${VHOST}/htdocs/index.html
+
+chown -R ftp /srv/www/${VHOST}/{tmp,htdocs,includes}
+
+a2ensite ${VHOST}
+apache2ctl configtest && apache2ctl graceful && echo "Reloaded apache2"
