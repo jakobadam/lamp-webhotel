@@ -30,7 +30,7 @@ add_db(){
     read -s -p 'Enter MySQL root password:' DB_ROOT_PWD
     mysql -u root -p$DB_ROOT_PWD <<EOF
 CREATE database ${DB_NAME};
-GRANT USAGE ON  *.* TO '${DB_NAME}'@'%' IDENTIFIED BY '${PASS}';
+CREATE USER '${VHOST}'@'%' IDENTIFIED BY '${PASS}';
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX, CREATE TEMPORARY TABLES ON \`${DB_NAME}\`.* TO '${DB_NAME}'@'%';
 flush privileges;
 EOF
