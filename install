@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Server setup script for webhotel
+
+read -s -p 'Enter root password for MySQL:' DB_PWD
+HERE=$(dirname $(readlink -f $0))
+
+# Set values for unattended installation
+echo mysql-server mysql-server/root_password password $DB_PWD | debconf-set-selections
+echo mysql-server mysql-server/root_password_again password $DB_PWD | debconf-set-selections
+echo phpmyadmin phpmyadmin/dbconfig-install boolean true | debconf-set-selections
+echo phpmyadmin phpmyadmin/mysql/admin-pass password $DB_PWD | debconf-set-selections
+echo phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2 | debconf-set-selections
+
+PACKAGES="
+apache2 
+apache2-utils
+libpam-pwdfile
+mysql-server 
+phpmyadmin 
+pwgen
+vsftpd 
+whois
+"
+apt-get -y install $PACKAGES
+
+mkdir /etc/vsftpd /etc/vsftpd_users
+
+# http://howto.gumph.org/content/setup-virtual-users-and-directories-in-vsftpd/
+cat > /etc/pam.d/vsftpd <<EOF
+auth    required pam_pwdfile.so pwdfile /etc/vsftpd/passwd
+account required pam_permit.so
+EOF
+
+# Secure phpmyadmin with basic auth
+# valid users are the ones in /etc/vsftp/passwd
+
+# This file is sym.linked from /etc/apache2/conf-available
+cp /etc/phpmyadmin/apache.conf /etc/phpmyadmin/apache.conf.ba
+cp $HERE/conf/phpmyadmin.apache.conf /etc/phpmyadmin/apache.conf
+
+# Configure vsftp
+cat >> /etc/vsftpd.conf <<EOF
+anonymous_enable=NO
+chroot_local_user=YES
+connect_from_port_20=YES
+force_dot_files=YES
+guest_enable=YES
+hide_ids=YES
+listen=YES
+local_enable=YES
+pam_service_name=vsftpd
+secure_chroot_dir=/var/run/vsftpd/empty
+user_config_dir=/etc/vsftpd_users
+virtual_use_local_privs=YES
+write_enable=YES
+EOF
+
+service vsftpd restart
+service apache2 restart

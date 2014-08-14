@@ -1,0 +1,111 @@
+#!/bin/bash 
+# Add new vhost and ftp user to the system, optionally also
+# new mysql database
+
+VHOST=$1
+DB_NAME=$2
+HERE=$(dirname $(readlink -f $0))
+
+if [ "$(id -u)" != "0" ]; then
+    echo 'Please run this script as root - HINT: use sudo'
+    exit
+fi
+
+if [ -z "$VHOST" ]; then
+    echo "Usage: $0 VHOST [DB]"
+    echo 
+    echo 'Create new vhost, ftp user and optionally new db.'
+    echo 'The ftp username is the vhost, password is randomly'
+    echo 'generated'
+    exit
+fi
+
+if [ -f /etc/apache2/sites-available/${VHOST}.conf ]; then
+    echo "The site ${VHOST} already exists!"
+    exit
+fi
+
+add_db(){
+    echo "Adding database: ${DB_NAME}"
+    read -s -p 'Enter MySQL root password:' DB_ROOT_PWD
+    mysql -u root -p$DB_ROOT_PWD <<EOF
+CREATE database ${DB_NAME};
+GRANT USAGE ON  *.* TO '${DB_NAME}'@'%' IDENTIFIED BY '${PASS}';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX, CREATE TEMPORARY TABLES ON \`${DB_NAME}\`.* TO '${DB_NAME}'@'%';
+flush privileges;
+EOF
+}
+
+add_ftp(){
+    echo "Adding ftp user: ${VHOST}"
+    PASS=`pwgen -1`
+    HASH=$(mkpasswd -m sha-512 ${PASS})
+    echo "${VHOST}:${HASH}" >> /etc/vsftpd/passwd
+
+    echo "local_root=/srv/www/${VHOST}" > /tmp/${VHOST}.tmp
+    mv /tmp/${VHOST}.tmp /etc/vsftpd_users/${VHOST}
+}
+
+add_vhost(){
+    echo "Creating vhost: ${VHOST}"
+    sed s/VHOST/${VHOST}/g $HERE/templates/vhosttemplate > /etc/apache2/sites-available/${VHOST}.conf
+
+    mkdir -p /srv/www/${VHOST}/{tmp,htdocs,includes}
+    sed s/VHOST/${VHOST}/g $HERE/templates/index.html > /srv/www/${VHOST}/htdocs/index.html
+
+    chown -R ftp /srv/www/${VHOST}/{tmp,htdocs,includes}
+}
+
+success(){
+    local ip=$(wget -q -O- http://checkip.dyndns.org | egrep -o '[0-9\.]+')
+    local domainname=$(host $ip | cut -d' ' -f5)
+    # chop away the trailing .
+    domainname=${domainname::-1}
+    cat << EOF
+
+----------- Send this as email to customer ------
+
+Information about access to you new site: ${VHOST}
+
+Server:                 ${domainname}
+Ip:                     ${ip}
+
+FTP Server:		${domainname}
+FTP Brugernavn:		${VHOST}
+FTP Adgangskode:	${PASS}
+
+EOF
+
+    if [ ! -z "$DB_NAME" ]; then
+	cat <<EOF
+MySQL Server:		localhost
+MySQL Brugernavn:	${DB_NAME}
+MySQL Adgangskode:	${PASS}
+MySQL Database:		${DB_NAME}
+
+PHPMyAdmin:             ${domainname}/phpmyadmin
+
+EOF
+    fi
+    
+    cat <<EOF
+
+You should add a DNS CNAME record to $(domainname)
+----------------------------------------------------
+EOF
+}
+
+enable_vhost(){
+    a2ensite ${VHOST}
+    apache2ctl configtest && apache2ctl graceful && echo "Reloaded apache2"
+}
+
+add_vhost
+add_ftp
+
+if [ ! -z "$DB_NAME" ]; then
+    add_db
+fi
+
+enable_vhost
+success
