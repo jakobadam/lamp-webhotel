@@ -19,6 +19,7 @@
   
     <Directory /srv/www/VHOST/htdocs>
         AllowOverride All
+        Require all granted
     </Directory>
   
     php_admin_value doc_root /srv/www/VHOST/htdocs
