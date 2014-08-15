@@ -1,0 +1,34 @@
+<VirtualHost *:80>
+    ServerName              VHOST
+    ServerAlias             VHOST
+    Redirect permanent / https://VHOST/
+</VirtualHost>
+
+<VirtualHost *:443>
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/file.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/file.key
+    SSLCACertificateFile /etc/apache2/ssl/cacert.pem
+  
+    SSLProtocol all
+    SSLCipherSuite HIGH:MEDIUM
+  
+    ServerName              VHOST
+    ServerAlias             VHOST
+    DocumentRoot            /srv/www/VHOST/htdocs
+  
+    <Directory /srv/www/VHOST/htdocs>
+        AllowOverride All
+    </Directory>
+  
+    php_admin_value doc_root /srv/www/VHOST/htdocs
+    php_admin_value open_basedir /srv/www/COMMON/:/srv/www/VHOST/includes/:/srv/www/VHOST/htdocs/:/usr/local/share/phpmailer/:/srv/www/VHOST/tmp/:.
+    php_admin_value upload_tmp_dir /srv/www/VHOST/tmp/
+    php_admin_value include_path /srv/www/VHOST/includes/:/usr/local/share/phpmailer/:.
+    php_admin_flag safe_mode_gid true
+    php_admin_flag safe_mode on
+    php_admin_flag safe_mode_gid on
+    php_admin_flag engine on
+    php_admin_value max_execution_time 30
+    php_admin_value auto_prepend_file /srv/www/COMMON/autoprepend-umask.php
+</VirtualHost>
