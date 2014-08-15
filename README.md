@@ -25,6 +25,15 @@ Users has access through ftp. VHOST is the username. Password is
 random generated. Users are not linux users, but separated and stored
 in /etc/vsftp/passwd
 
+## Secure SSH
+
+Consider locking down SSH access to only some specific clients through
+/etc/hosts.{allow,deny}
+
+```
+./secure_ssh YOUR_IP
+```
+
 ## Test
 
 ```

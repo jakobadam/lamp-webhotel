@@ -1,0 +1,5 @@
+# /etc/hosts.allow: list of hosts that are allowed to access the system.
+#                   See the manual pages hosts_access(5) and hosts_options(5).
+sshd: 127.0.0.1
+sshd: [::1]
+sshd: 10.0.0.0/255.0.0.0

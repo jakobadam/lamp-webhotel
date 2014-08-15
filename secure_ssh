@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+CLIENT=$1
+HERE=$(dirname $(readlink -f $0))
+
+if [ -z "$CLIENT" ]; then
+    echo "Usage: $0 CLIENT [:OPTION1:OPTION2:...]"
+    echo 'Allow SSH from only the given client'
+    echo 'See man hosts_access for the format of this'
+    exit
+fi
+
+cp $HERE/templates/hosts.deny /etc/hosts.deny
+cp $HERE/templates/hosts.allow /etc/hosts.allow
+
+# Allow given client 
+echo "sshd: ${CLIENT}" >> /etc/hosts.allow
