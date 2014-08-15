@@ -59,5 +59,8 @@ virtual_use_local_privs=YES
 write_enable=YES
 EOF
 
+# Enable SSL
+a2enmod ssl
+
 service vsftpd restart
 service apache2 restart
