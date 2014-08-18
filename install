@@ -57,6 +57,9 @@ secure_chroot_dir=/var/run/vsftpd/empty
 user_config_dir=/etc/vsftpd_users
 virtual_use_local_privs=YES
 write_enable=YES
+pasv_enable=Yes
+pasv_min_port=10090
+pasv_max_port=11000
 EOF
 
 # Enable SSL
