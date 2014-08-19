@@ -26,6 +26,10 @@ vsFTP is configured to use passive mode, i.d., the server is passive and the cli
 
 Users has acccess to directories under /srv/www/VHOST/{tmp,htdocs,includes}
 
+## Apache
+
+Apache is running under the ftp user. This allows apache to read user uploads from ftp. 
+
 ## Secure SSH
 
 Consider locking down SSH access to only some specific clients through
