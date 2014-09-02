@@ -1,7 +1,6 @@
 # Webhotel
 
-Script to setup a simple webhotel with Apache, MySQL, PHP, and
-phpmyadmin.
+Script to setup a simple webhotel with Apache, MySQL, PHP, vsFTP, and phpmyadmin.
 
 Tested on Ubuntu 14.04
 
@@ -19,11 +18,17 @@ Add new vhost and optionally db:
 ./add VHOST [DB]
 ```
 
-This create directories under /srv/www/VHOST/{tmp,htdocs,includes}
+## FTP
 
-Users has access through ftp. VHOST is the username. Password is
-random generated. Users are not linux users, but separated and stored
-in /etc/vsftp/passwd
+Users has access through ftp. VHOST is the username. Password is random generated. Users are not linux users, but separated and stored in /etc/vsftp/passwd
+
+vsFTP is configured to use passive mode, i.d., the server is passive and the client initiates the connection avoiding firewall issues. 
+
+Users has acccess to directories under /srv/www/VHOST/{tmp,htdocs,includes}
+
+## Apache
+
+Apache is running under the ftp user. This allows apache to read user uploads from ftp. 
 
 ## Secure SSH
 

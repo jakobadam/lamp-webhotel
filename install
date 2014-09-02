@@ -58,10 +58,16 @@ user_config_dir=/etc/vsftpd_users
 virtual_use_local_privs=YES
 write_enable=YES
 local_umask=022
+pasv_enable=Yes
+pasv_min_port=10090
+pasv_max_port=11000
 EOF
 
 # Configure postfix
 postconf -e 'inet_interfaces = 127.0.0.1'
+
+# Make ftp uploads accessible by apache
+sed -i s/www-data/ftp/g /etc/apache2/envvars
 
 # Enable SSL
 a2enmod ssl
