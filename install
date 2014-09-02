@@ -57,10 +57,15 @@ secure_chroot_dir=/var/run/vsftpd/empty
 user_config_dir=/etc/vsftpd_users
 virtual_use_local_privs=YES
 write_enable=YES
+local_umask=022
 EOF
+
+# Configure postfix
+postconf -e 'inet_interfaces = 127.0.0.1'
 
 # Enable SSL
 a2enmod ssl
 
 service vsftpd restart
 service apache2 restart
+service postfix restart
